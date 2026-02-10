@@ -76,6 +76,7 @@ If you change the port, set the `REST_BASE` environment variable in your MCP con
     }
   }
 }
+```
 
 ## License
 
