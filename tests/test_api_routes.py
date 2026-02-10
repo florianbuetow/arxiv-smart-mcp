@@ -13,7 +13,7 @@ def _make_config() -> Config:
     return Config(
         service=ServiceConfig(
             host="127.0.0.1",
-            port=7001,
+            port=7171,
             reload=False,
             log_level="INFO",
         ),

@@ -1,6 +1,6 @@
 service:
   host: "127.0.0.1"
-  port: 7001
+  port: 7171
   reload: true
   log_level: "INFO"
 

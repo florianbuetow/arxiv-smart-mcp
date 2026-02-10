@@ -19,7 +19,7 @@ def _valid_config_data() -> dict:
     return {
         "service": {
             "host": "127.0.0.1",
-            "port": 7001,
+            "port": 7171,
             "reload": True,
             "log_level": "INFO",
         },
@@ -36,13 +36,13 @@ def _valid_config_data() -> dict:
 
 class TestServiceConfig:
     def test_valid_service_config(self):
-        config = ServiceConfig(host="127.0.0.1", port=7001, reload=True, log_level="INFO")
+        config = ServiceConfig(host="127.0.0.1", port=7171, reload=True, log_level="INFO")
         assert config.host == "127.0.0.1"
-        assert config.port == 7001
+        assert config.port == 7171
 
     def test_empty_host_raises(self):
         with pytest.raises(ValidationError):
-            ServiceConfig(host="  ", port=7001, reload=True, log_level="INFO")
+            ServiceConfig(host="  ", port=7171, reload=True, log_level="INFO")
 
     def test_invalid_port_zero(self):
         with pytest.raises(ValidationError):
@@ -54,7 +54,7 @@ class TestServiceConfig:
 
     def test_empty_log_level_raises(self):
         with pytest.raises(ValidationError):
-            ServiceConfig(host="localhost", port=7001, reload=True, log_level="  ")
+            ServiceConfig(host="localhost", port=7171, reload=True, log_level="  ")
 
 
 class TestArxivConfig:
@@ -149,7 +149,7 @@ class TestConfig:
             _write_yaml(config_path, _valid_config_data())
             config = Config.from_yaml(config_path)
             service = config.get_service_config()
-            assert service.port == 7001
+            assert service.port == 7171
 
     def test_get_arxiv_config(self):
         with tempfile.TemporaryDirectory() as tmpdir:

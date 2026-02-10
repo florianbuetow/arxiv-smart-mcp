@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 
-const REST_BASE = process.env.REST_BASE ?? "http://127.0.0.1:7001";
+const REST_BASE = process.env.REST_BASE ?? "http://127.0.0.1:7171";
 const HEALTH_TIMEOUT_MS = 3000;
 
 const server = new McpServer({

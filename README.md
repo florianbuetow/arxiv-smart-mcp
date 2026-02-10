@@ -33,6 +33,8 @@ just init
 just start
 ```
 
+The proxy must be running for the MCP tools to work. The MCP server connects to the proxy on `http://127.0.0.1:7171` by default.
+
 **2. Connect the MCP server**
 
 Paste this to your AI assistant and ask it to add this MCP server:
@@ -55,9 +57,25 @@ Replace `/path/to/arxiv-smart-mcp` with the actual path to this repository.
 
 The proxy is configured via `config.yaml`, which is created from `config.yaml.template` during `just init`. Key settings:
 
-- **port** — proxy listen port (default: 7001)
+- **port** — proxy listen port (default: 7171)
 - **rate_limit_seconds** — minimum interval between arXiv API calls (default: 3.0)
 - **request_timeout_seconds** — timeout for arXiv API requests (default: 30.0)
+
+If you change the port, set the `REST_BASE` environment variable in your MCP config so the MCP server can find the proxy:
+
+```json
+{
+  "mcpServers": {
+    "arxiv-smart": {
+      "command": "npx",
+      "args": ["tsx", "mcp/arxiv-smart.ts"],
+      "cwd": "/path/to/arxiv-smart-mcp",
+      "env": {
+        "REST_BASE": "http://127.0.0.1:7171"
+      }
+    }
+  }
+}
 
 ## License
 

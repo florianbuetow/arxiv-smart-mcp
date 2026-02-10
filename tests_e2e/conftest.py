@@ -16,7 +16,7 @@ def service_url():
         stderr=subprocess.PIPE,
     )
 
-    base_url = "http://127.0.0.1:7001"
+    base_url = "http://127.0.0.1:7171"
     max_wait = 15
     start_time = time.time()
 
