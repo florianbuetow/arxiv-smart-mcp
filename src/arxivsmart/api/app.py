@@ -39,8 +39,13 @@ def create_app(config: Config) -> FastAPI:
 
     arxiv_config = config.get_arxiv_config()
 
-    rate_limiter = RateLimiter(min_interval_seconds=arxiv_config.rate_limit_seconds)
-    arxiv_client = ArxivClient(config=arxiv_config, rate_limiter=rate_limiter)
+    api_rate_limiter = RateLimiter(min_interval_seconds=arxiv_config.rate_limit_seconds)
+    pdf_rate_limiter = RateLimiter(min_interval_seconds=arxiv_config.rate_limit_seconds)
+    arxiv_client = ArxivClient(
+        config=arxiv_config,
+        api_rate_limiter=api_rate_limiter,
+        pdf_rate_limiter=pdf_rate_limiter,
+    )
 
     app = FastAPI(lifespan=lifespan)
     app.state.config = config

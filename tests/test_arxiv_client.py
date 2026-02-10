@@ -39,26 +39,25 @@ def _make_config() -> ArxivConfig:
     )
 
 
-def _make_client() -> ArxivClient:
-    config = _make_config()
-    rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
-    return ArxivClient(config=config, rate_limiter=rate_limiter)
+def _make_mock_response(status_code=200, content=b"", text=""):
+    mock_response = MagicMock()
+    mock_response.status_code = status_code
+    mock_response.content = content
+    mock_response.text = text
+    return mock_response
 
 
 class TestArxivClientSearch:
     @patch("arxivsmart.arxiv.client.httpx.Client")
     def test_search_returns_results(self, mock_client_cls):
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.content = SAMPLE_SEARCH_XML
+        mock_http = MagicMock()
+        mock_http.get.return_value = _make_mock_response(status_code=200, content=SAMPLE_SEARCH_XML)
+        mock_client_cls.return_value = mock_http
 
-        mock_instance = MagicMock()
-        mock_instance.get.return_value = mock_response
-        mock_instance.__enter__ = MagicMock(return_value=mock_instance)
-        mock_instance.__exit__ = MagicMock(return_value=False)
-        mock_client_cls.return_value = mock_instance
+        config = _make_config()
+        rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
+        client = ArxivClient(config=config, api_rate_limiter=rate_limiter, pdf_rate_limiter=rate_limiter)
 
-        client = _make_client()
         result = client.search(
             query="quantum computing",
             start=0,
@@ -73,17 +72,14 @@ class TestArxivClientSearch:
 
     @patch("arxivsmart.arxiv.client.httpx.Client")
     def test_search_non_200_raises(self, mock_client_cls):
-        mock_response = MagicMock()
-        mock_response.status_code = 503
-        mock_response.text = "Service Unavailable"
+        mock_http = MagicMock()
+        mock_http.get.return_value = _make_mock_response(status_code=503, text="Service Unavailable")
+        mock_client_cls.return_value = mock_http
 
-        mock_instance = MagicMock()
-        mock_instance.get.return_value = mock_response
-        mock_instance.__enter__ = MagicMock(return_value=mock_instance)
-        mock_instance.__exit__ = MagicMock(return_value=False)
-        mock_client_cls.return_value = mock_instance
+        config = _make_config()
+        rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
+        client = ArxivClient(config=config, api_rate_limiter=rate_limiter, pdf_rate_limiter=rate_limiter)
 
-        client = _make_client()
         with pytest.raises(RuntimeError, match="arXiv API returned status 503"):
             client.search(
                 query="test",
@@ -97,17 +93,14 @@ class TestArxivClientSearch:
 class TestArxivClientGetPaper:
     @patch("arxivsmart.arxiv.client.httpx.Client")
     def test_get_paper_returns_paper(self, mock_client_cls):
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.content = SAMPLE_SEARCH_XML
+        mock_http = MagicMock()
+        mock_http.get.return_value = _make_mock_response(status_code=200, content=SAMPLE_SEARCH_XML)
+        mock_client_cls.return_value = mock_http
 
-        mock_instance = MagicMock()
-        mock_instance.get.return_value = mock_response
-        mock_instance.__enter__ = MagicMock(return_value=mock_instance)
-        mock_instance.__exit__ = MagicMock(return_value=False)
-        mock_client_cls.return_value = mock_instance
+        config = _make_config()
+        rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
+        client = ArxivClient(config=config, api_rate_limiter=rate_limiter, pdf_rate_limiter=rate_limiter)
 
-        client = _make_client()
         paper = client.get_paper("2301.00001v1")
         assert paper.arxiv_id == "2301.00001v1"
         assert paper.title == "Test Paper"
@@ -116,32 +109,27 @@ class TestArxivClientGetPaper:
 class TestArxivClientDownloadPdf:
     @patch("arxivsmart.arxiv.client.httpx.Client")
     def test_download_pdf_returns_bytes(self, mock_client_cls):
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.content = b"%PDF-1.4 fake content"
+        mock_http = MagicMock()
+        mock_http.get.return_value = _make_mock_response(status_code=200, content=b"%PDF-1.4 fake content")
+        mock_client_cls.return_value = mock_http
 
-        mock_instance = MagicMock()
-        mock_instance.get.return_value = mock_response
-        mock_instance.__enter__ = MagicMock(return_value=mock_instance)
-        mock_instance.__exit__ = MagicMock(return_value=False)
-        mock_client_cls.return_value = mock_instance
+        config = _make_config()
+        rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
+        client = ArxivClient(config=config, api_rate_limiter=rate_limiter, pdf_rate_limiter=rate_limiter)
 
-        client = _make_client()
         pdf_bytes = client.download_pdf("2301.00001v1")
         assert pdf_bytes == b"%PDF-1.4 fake content"
 
     @patch("arxivsmart.arxiv.client.httpx.Client")
     def test_download_pdf_non_200_raises(self, mock_client_cls):
-        mock_response = MagicMock()
-        mock_response.status_code = 404
+        mock_http = MagicMock()
+        mock_http.get.return_value = _make_mock_response(status_code=404)
+        mock_client_cls.return_value = mock_http
 
-        mock_instance = MagicMock()
-        mock_instance.get.return_value = mock_response
-        mock_instance.__enter__ = MagicMock(return_value=mock_instance)
-        mock_instance.__exit__ = MagicMock(return_value=False)
-        mock_client_cls.return_value = mock_instance
+        config = _make_config()
+        rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
+        client = ArxivClient(config=config, api_rate_limiter=rate_limiter, pdf_rate_limiter=rate_limiter)
 
-        client = _make_client()
         with pytest.raises(RuntimeError, match="PDF download failed"):
             client.download_pdf("nonexistent")
 
@@ -149,17 +137,14 @@ class TestArxivClientDownloadPdf:
 class TestArxivClientFetchHtml:
     @patch("arxivsmart.arxiv.client.httpx.Client")
     def test_fetch_html_returns_string(self, mock_client_cls):
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.text = "<html><body>paper content</body></html>"
+        mock_http = MagicMock()
+        mock_http.get.return_value = _make_mock_response(status_code=200, text="<html><body>paper content</body></html>")
+        mock_client_cls.return_value = mock_http
 
-        mock_instance = MagicMock()
-        mock_instance.get.return_value = mock_response
-        mock_instance.__enter__ = MagicMock(return_value=mock_instance)
-        mock_instance.__exit__ = MagicMock(return_value=False)
-        mock_client_cls.return_value = mock_instance
+        config = _make_config()
+        rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
+        client = ArxivClient(config=config, api_rate_limiter=rate_limiter, pdf_rate_limiter=rate_limiter)
 
-        client = _make_client()
         html = client.fetch_html("2301.00001v1")
         assert "<html>" in html
 
@@ -167,17 +152,14 @@ class TestArxivClientFetchHtml:
 class TestArxivClientFetchMarkdown:
     @patch("arxivsmart.arxiv.client.httpx.Client")
     def test_fetch_markdown_converts_html(self, mock_client_cls):
-        mock_response = MagicMock()
-        mock_response.status_code = 200
-        mock_response.text = "<html><body><h1>Title</h1><p>Content</p></body></html>"
+        mock_http = MagicMock()
+        mock_http.get.return_value = _make_mock_response(status_code=200, text="<html><body><h1>Title</h1><p>Content</p></body></html>")
+        mock_client_cls.return_value = mock_http
 
-        mock_instance = MagicMock()
-        mock_instance.get.return_value = mock_response
-        mock_instance.__enter__ = MagicMock(return_value=mock_instance)
-        mock_instance.__exit__ = MagicMock(return_value=False)
-        mock_client_cls.return_value = mock_instance
+        config = _make_config()
+        rate_limiter = RateLimiter(min_interval_seconds=config.rate_limit_seconds)
+        client = ArxivClient(config=config, api_rate_limiter=rate_limiter, pdf_rate_limiter=rate_limiter)
 
-        client = _make_client()
         md = client.fetch_markdown("2301.00001v1")
         assert isinstance(md, str)
         assert len(md) > 0
