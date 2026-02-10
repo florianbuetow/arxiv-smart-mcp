@@ -27,8 +27,10 @@ async def unhandled_exception_handler(request: Request, exc: Exception) -> JSONR
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Manage application lifecycle — stateless proxy, no cleanup needed."""
+    """Manage application lifecycle — close HTTP connection on shutdown."""
     yield
+    arxiv_client: ArxivClient = app.state.arxiv_client
+    arxiv_client.close()
 
 
 def create_app(config: Config) -> FastAPI:
