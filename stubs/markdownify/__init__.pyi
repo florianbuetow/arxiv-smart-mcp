@@ -1,0 +1,3 @@
+"""Type stubs for markdownify — covers only the API surface used by arxivsmart."""
+
+def markdownify(html: str, **kwargs: object) -> str: ...

@@ -1,0 +1,6 @@
+"""Type stubs for defusedxml.ElementTree — covers only the API surface used by arxivsmart."""
+
+from xml.etree.ElementTree import Element as Element
+
+def fromstring(text: str | bytes) -> Element: ...
+def parse(source: str) -> Element: ...

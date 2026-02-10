@@ -1,0 +1,13 @@
+service:
+  host: "127.0.0.1"
+  port: 7001
+  reload: true
+  log_level: "INFO"
+
+arxiv:
+  base_url: "https://export.arxiv.org/api/query"
+  pdf_base_url: "https://arxiv.org/pdf"
+  html_base_url: "https://ar5iv.labs.arxiv.org/html"
+  rate_limit_seconds: 3.0
+  request_timeout_seconds: 30.0
+  max_results_limit: 2000
