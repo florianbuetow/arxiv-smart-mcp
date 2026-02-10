@@ -1,4 +1,4 @@
-# arxiv-smart-mcp
+# arXiv MCP Server and Rate Limiting Proxy
 
 MCP server for searching and reading arXiv papers from AI assistants — self-rate-limited to avoid getting blocked by the arXiv API.
 
