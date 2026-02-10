@@ -111,6 +111,15 @@ def parse_entry(entry: ElementTree.Element) -> Paper:
     )
 
 
+def parse_single_paper_response(xml_bytes: bytes, arxiv_id: str) -> Paper:
+    """Parse an Atom feed expected to contain exactly one paper entry."""
+    root = ElementTree.fromstring(xml_bytes)
+    entries = root.findall("{http://www.w3.org/2005/Atom}entry")
+    if len(entries) == 0:
+        raise ValueError(f"no paper found with arXiv ID: {arxiv_id}")
+    return parse_entry(entries[0])
+
+
 def parse_search_response(xml_bytes: bytes) -> SearchResult:
     """Parse a full Atom feed from arXiv search API."""
     root = ElementTree.fromstring(xml_bytes)
